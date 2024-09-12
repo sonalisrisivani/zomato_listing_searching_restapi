@@ -1,7 +1,6 @@
 const express = require('express');
 const mysql = require('mysql');
 const path= require('path');
-//const cors = require('cors'); // Required for making API requests from different origins ,ex: frontetnd port 4000 backend 3000
 const app = express();
 
 // Serve static files from the "public" directory
@@ -22,7 +21,9 @@ db.connect((err) => {
   console.log('MySQL connected...');
 });
 
-// API endpoint to search restaurants based on query and location
+
+
+// API endpoint to search restaurants based on query and location and sort
 app.get('/api/search', (req, res) => {
   const { q, location, sort } = req.query;
   console.log(`Search query: ${q}, Location query: ${location},  Sort by: ${sort}`);
@@ -78,15 +79,16 @@ app.get('/api/restaurant/:id', (req, res) => {
 
 
 
-// API endpoint to get paginated restaurant data
+// API endpoint to get paginated restaurant data and sorting
 app.get('/api/restaurants', (req, res) => {
   const limit = parseInt(req.query.limit, 10) || 10; // Default to 10 if not specified
   const start = parseInt(req.query.start, 10) || 0; // Default to 0 if not specified
-
+  
+ 
   const sqlPaginated = `
     SELECT r.id, r.name, r.aggregate_rating, r.votes, l.city AS location
     FROM restaurants r
-    JOIN locations l ON r.location_id = l.id
+    JOIN locations l ON r.location_id = l.id    
     LIMIT ? OFFSET ?
   `;
 

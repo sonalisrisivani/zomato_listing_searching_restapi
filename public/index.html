@@ -15,8 +15,13 @@
 <body>
     <h1>Restaurants</h1>
     <div>
-        <input type="text" id="query" placeholder="Search restaurant name or cuisine name ">
+        <input type="text" id="query" placeholder="Search restaurant name or cuisine name">
         <input type="text" id="location" placeholder="Location">
+        <select id="sort">
+            <option value="aggregate_rating">Sort by Rating</option>
+            <option value="votes">Sort by Votes</option>
+            <option value="name">Sort by Name</option>
+        </select>
         <button onclick="searchRestaurants()">Search</button>
     </div>
     <div id="restaurants-container"></div>
@@ -25,9 +30,10 @@
         async function searchRestaurants() {
             const query = document.getElementById('query').value;
             const location = document.getElementById('location').value;
+            const sort = document.getElementById('sort').value;
 
             try {
-                const response = await fetch(`http://localhost:3000/api/search?q=${query}&location=${location}`);
+                const response = await fetch(`http://localhost:3000/api/search?q=${query}&location=${location}&sort=${sort}`);
                 const restaurants = await response.json();
                 displayRestaurants(restaurants);
             } catch (error) {
@@ -48,19 +54,14 @@
                 const restaurantDiv = document.createElement('div');
                 restaurantDiv.classList.add('restaurant');
 
-            // Make each restaurant a clickable link that redirects to restaurant.html with the restaurant ID
-        restaurantDiv.innerHTML = `
-            <h2><a href="restaurant.html?id=${restaurant.id}">${restaurant.name}</a></h2>
-            <p>Location: ${restaurant.city}, ${restaurant.address}</p>
-            <p>Cuisines: ${restaurant.cuisines}</p>
-            <p>Rating: ${restaurant.aggregate_rating}</p>
-        `;
-        container.appendChild(restaurantDiv);
-
-
-
-
-
+                // Make each restaurant a clickable link that redirects to restaurant.html with the restaurant ID
+                restaurantDiv.innerHTML = `
+                    <h2><a href="restaurant.html?id=${restaurant.id}">${restaurant.name}</a></h2>
+                    <p>Location: ${restaurant.city}, ${restaurant.address}</p>
+                    <p>Cuisines: ${restaurant.cuisines}</p>
+                    <p>Rating: ${restaurant.aggregate_rating}</p>
+                `;
+                container.appendChild(restaurantDiv);
             });
         }
     </script>
