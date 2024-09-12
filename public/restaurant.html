@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zomato - Restaurant Details</title>
+</head>
+<body>
+
+<main>
+  <div class="restaurant-detail">
+    <h1 id="restaurant-name"></h1>
+    <img id="restaurant-image" src="" alt="Restaurant Image">
+    <p><strong>Address:</strong> <span id="restaurant-address"></span></p>
+    <p><strong>Cuisines:</strong> <span id="restaurant-cuisines"></span></p>
+    <p><strong>Average Cost for Two:</strong> <span id="restaurant-cost"></span></p>
+    <p><strong>Rating:</strong> <span id="restaurant-rating"></span></p>
+    <p><strong>Votes:</strong> <span id="restaurant-votes"></span></p>
+    <p><strong>Online Delivery:</strong> <span id="restaurant-delivery"></span></p>
+    <p><strong>Table Booking:</strong> <span id="restaurant-booking"></span></p>
+  </div>
+
+  <!-- Pagination Controls Removed -->
+  <div class="pagination-container">
+    <h2>Other Restaurants</h2>
+    <ul id="pagination-list">
+      <!-- Other restaurants will be loaded here -->
+    </ul>
+  </div>
+</main>
+
+<script>
+  // Get the restaurant ID from the URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const restaurantId = urlParams.get('id');
+
+  // Fetch the restaurant details
+  fetch(`/api/restaurant/${restaurantId}`)
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('restaurant-name').textContent = data.name;
+      document.getElementById('restaurant-image').src = data.featured_image;
+      document.getElementById('restaurant-image').alt = data.name;
+      document.getElementById('restaurant-address').textContent = data.address;
+      document.getElementById('restaurant-cuisines').textContent = data.cuisines;
+      document.getElementById('restaurant-cost').textContent = `${data.average_cost_for_two} ${data.currency}`;
+      document.getElementById('restaurant-rating').textContent = `${data.aggregate_rating} (${data.rating_text})`;
+      document.getElementById('restaurant-votes').textContent = data.votes;
+      document.getElementById('restaurant-delivery').textContent = data.has_online_delivery ? 'Yes' : 'No';
+      document.getElementById('restaurant-booking').textContent = data.has_table_booking ? 'Yes' : 'No';
+    })
+    .catch(err => console.error('Error fetching restaurant details:', err));
+
+  // Fetch and display 10 restaurants
+  document.addEventListener('DOMContentLoaded', () => {
+    const limit = 10; // Number of items per page
+    const pageNumberSpan = document.getElementById('page-number');
+
+    function fetchRestaurants() {
+      fetch(`/api/restaurants?limit=${limit}`)
+        .then(response => response.json())
+        .then(data => {
+          const paginationList = document.getElementById('pagination-list');
+          paginationList.innerHTML = ''; // Clear existing list
+          data.forEach(restaurant => {
+            const li = document.createElement('li');
+            const link = document.createElement('a');
+            link.href = `/restaurant.html?id=${restaurant.id}`;
+            link.textContent = `${restaurant.name} - ${restaurant.address} - Rating: ${restaurant.aggregate_rating}`;
+            li.appendChild(link);
+            paginationList.appendChild(li);
+          });
+        })
+        .catch(err => console.error('Error fetching paginated restaurants:', err));
+    }
+
+    // Fetch initial data
+    fetchRestaurants();
+  });
+</script>
+</body>
+</html>

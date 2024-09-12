@@ -15,7 +15,7 @@
 <body>
     <h1>Restaurants</h1>
     <div>
-        <input type="text" id="query" placeholder="Search restaurants">
+        <input type="text" id="query" placeholder="Search restaurant name or cuisine name ">
         <input type="text" id="location" placeholder="Location">
         <button onclick="searchRestaurants()">Search</button>
     </div>
@@ -48,13 +48,19 @@
                 const restaurantDiv = document.createElement('div');
                 restaurantDiv.classList.add('restaurant');
 
-                restaurantDiv.innerHTML = `
-                    <h2>${restaurant.name}</h2>
-                    <p>Location: ${restaurant.city}, ${restaurant.address}</p>
-                    <p>Cuisines: ${restaurant.cuisines}</p>
-                    <p>Rating: ${restaurant.aggregate_rating}</p>
-                `;
-                container.appendChild(restaurantDiv);
+            // Make each restaurant a clickable link that redirects to restaurant.html with the restaurant ID
+        restaurantDiv.innerHTML = `
+            <h2><a href="restaurant.html?id=${restaurant.id}">${restaurant.name}</a></h2>
+            <p>Location: ${restaurant.city}, ${restaurant.address}</p>
+            <p>Cuisines: ${restaurant.cuisines}</p>
+            <p>Rating: ${restaurant.aggregate_rating}</p>
+        `;
+        container.appendChild(restaurantDiv);
+
+
+
+
+
             });
         }
     </script>

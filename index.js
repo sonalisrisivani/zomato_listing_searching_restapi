@@ -1,9 +1,12 @@
 const express = require('express');
 const mysql = require('mysql');
-const cors = require('cors'); // Required for making API requests from different origins
+const path= require('path');
+//const cors = require('cors'); // Required for making API requests from different origins ,ex: frontetnd port 4000 backend 3000
 const app = express();
 
-app.use(cors()); // Enable CORS for cross-origin requests
+// Serve static files from the "public" directory
+app.use(express.static(path.join(__dirname, 'public')));
+
 
 const db = mysql.createConnection({
   host: 'localhost',
@@ -72,6 +75,31 @@ app.get('/api/restaurant/:id', (req, res) => {
     res.json(restaurantResults[0]); // Send the restaurant data as JSON
   });
 });
+
+
+
+// API endpoint to get paginated restaurant data
+app.get('/api/restaurants', (req, res) => {
+  const limit = parseInt(req.query.limit, 10) || 10; // Default to 10 if not specified
+  const start = parseInt(req.query.start, 10) || 0; // Default to 0 if not specified
+
+  const sqlPaginated = `
+    SELECT r.id, r.name, r.aggregate_rating, r.votes, l.city AS location
+    FROM restaurants r
+    JOIN locations l ON r.location_id = l.id
+    LIMIT ? OFFSET ?
+  `;
+
+  // Execute the SQL query with the limit and start parameters
+  db.query(sqlPaginated, [limit, start], (error, results) => {
+    if (error) {
+      console.error('Error executing SQL query:', error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+    res.json(results);
+  });
+});
+
 
 const PORT = 3000;
 app.listen(PORT, () => {
